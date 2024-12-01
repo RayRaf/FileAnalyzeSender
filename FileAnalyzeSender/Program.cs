@@ -6,6 +6,7 @@ using OpenQA.Selenium.Edge;
 using OpenQA.Selenium.Support.UI;
 using System.Diagnostics;
 using Microsoft.Extensions.Configuration;
+using System.Collections.ObjectModel;
 
 namespace FileAnalyzeSender
 {
@@ -54,8 +55,14 @@ namespace FileAnalyzeSender
 
             try
             {
-                // Настройки браузера Edge
+                // Настройки браузера Edge с использованием отдельного профиля
                 var options = new EdgeOptions();
+                string userProfilePath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "Microsoft", "Edge", "User Data", "FileAnalyzeProfile");
+                if (!Directory.Exists(userProfilePath))
+                {
+                    Directory.CreateDirectory(userProfilePath);
+                }
+                options.AddArgument($"--user-data-dir={userProfilePath}");
 
                 // Создаем экземпляр EdgeDriver
                 driver = new EdgeDriver(options);
@@ -82,6 +89,11 @@ namespace FileAnalyzeSender
             catch (Exception)
             {
                 // Ошибка обрабатывается молча
+            }
+            finally
+            {
+                // Завершаем программу после выполнения действий
+                Environment.Exit(0);
             }
         }
     }
